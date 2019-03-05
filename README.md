@@ -1,5 +1,7 @@
 # WoW-PServer-Launcher (v0.0.95)
 A launcher i wrote for a side fun project. Currently has every basic feature such as autologin, cache clear, realmist patches etc etc.
+Backend PHP scripts here : https://github.com/sndcode/WoW-Pserver-Launcher-Backend-Scripts
+
 
 The Features are : 
 - Auto patch realmlist
