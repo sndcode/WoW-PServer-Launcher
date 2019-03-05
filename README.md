@@ -1,4 +1,4 @@
-# WoW-PServer-Launcher (v0.0.93)
+# WoW-PServer-Launcher (v0.0.95)
 A launcher i wrote for a side fun project. Currently has every basic feature such as autologin, cache clear, realmist patches etc etc.
 
 The Features are : 
@@ -20,12 +20,12 @@ The Features are :
 - In DEVMODE see bug tracker tickets 
 - Icons !
 - Bugtracker with attatchment support
-- 
+- many many more and some easter eggs
 
 
 INSTALLATION OF THE BACKEND AND SERVER SETUP:
 
-- You will need a mangos server for either 2.4.3 or 3.3.5a .
+- You will need a mangos server for either 2.4.3 or 3.3.5a . (works with any emulator when you change the backend SQL commands.)
 - First upload the www folder contents to your WEBSERVER.
 - Configure "www\wow\files\launcher\cfg.php" 
 - Configure "www\wow\settings\cfg.php"
@@ -36,7 +36,3 @@ INSTALLATION OF THE BACKEND AND SERVER SETUP:
 Thread = http://www.ac-web.org/forums/showthread.php?234784-C-Launcher-(GitHUB)-(Open-Source)
 
 ![Alt text](https://i.imgur.com/eOAaGRm.png " ")
-![Alt text](https://i.imgur.com/UFczkB6.png " ")
-![Alt text](https://i.imgur.com/2YUrG1h.png " ") 
-![Alt text](https://i.imgur.com/Q4XaKDN.png " ")
-![Alt text](https://i.imgur.com/fRnyPqw.png " ")
