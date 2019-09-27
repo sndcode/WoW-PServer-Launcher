@@ -1,4 +1,4 @@
-# WoW-PServer-Launcher (v0.0.93)
+# WoW-PServer-Launcher (v0.0.99)
 A launcher i wrote for a side fun project. Currently has every basic feature such as autologin, cache clear, realmist patches etc etc.
 
 The Features are : 
