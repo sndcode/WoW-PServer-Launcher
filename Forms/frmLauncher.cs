@@ -16,10 +16,8 @@ namespace PTFLauncher
         }
 
         [DllImport("user32.dll")]
-
-        
         private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-
+        public bool b_serveronline;
         public void closeForm()
         {
             this.Close();
@@ -44,7 +42,7 @@ namespace PTFLauncher
                 if (read == null)
                     MessageBox.Show("Settings not ready yet");
             }
-            
+
             var ini = new ini(classVars.s_settingspath);
             string path = ini.Read("path");
             string user = ini.Read("user");
@@ -57,6 +55,8 @@ namespace PTFLauncher
             pass = decoded;
             string clientversion = ini.Read("clVersion");
             string lanmode = ini.Read("lanmode");
+            string rl = ini.Read("fullrealmlist");
+            classVars.s_realmlistFullContent = rl; 
             classVars.s_lanmode = lanmode;
             classVars.cl_version = clientversion;
             classVars.s_autologin = autologin;
@@ -67,22 +67,30 @@ namespace PTFLauncher
             classVars.s_pass = pass;
             classVars.s_playandclose = playandclose;
         }
-
+        
         public void updateServerStatus()
         {
             try
             {
                 WebClient wc = new WebClient();
+                WebClient wc2 = new WebClient();
+                string uptime = wc2.DownloadString(classVars.url_s_uptime);
                 string result = wc.DownloadString(classVars.url_base + "wow/files/launcher/s_online.php");
                 if (result == "online")
                 {
                     lblServerStatus.Text = "Worldserver is online";
                     lblServerStatus.ForeColor = System.Drawing.Color.Green;
+                    lbluptime.ForeColor = System.Drawing.Color.Green;
+                    lbluptime.Text = uptime;
+                    b_serveronline = true;
                 }
                 else if (result == "offline")
                 {
                     lblServerStatus.Text = "Worldserver is offline";
                     lblServerStatus.ForeColor = System.Drawing.Color.Red;
+                    lbluptime.Text = "";
+                    lblOnlinePlayersValue.Text = "";
+                    b_serveronline = false;
                 }
             }
             catch
@@ -90,6 +98,7 @@ namespace PTFLauncher
                 lblServerStatus.Text = "Worldserver is offline";
                 lblServerStatus.ForeColor = System.Drawing.Color.Red;
             }
+
         }
 
         public void InitLauncher()
@@ -98,7 +107,7 @@ namespace PTFLauncher
             linkLabel1.Visible = false;
             this.TopMost = true;
             bool connection = classNetworking.checkConnection();
-            
+
 
             try
             {
@@ -117,12 +126,17 @@ namespace PTFLauncher
                 try
                 {
                     updateServerStatus();
-                    lblVersion.Text = classVars.appversion;
                     bool b = classNetworking.updateAvailable();
 
                     if (b && classVars.s_update_checks == "true")
                     {
-                        MessageBox.Show("we have a new update !");
+                        MessageBox.Show("Update found!"
+                        + "\n"
+                        + " - Server Version : " + classVars.version_server
+                        + "\n"
+                        + " - Your Version : " + classVars.version_local
+                        + "\n"
+                        + "Please download and install the update now.");
                         linkLabel1.Visible = true;
                     }
 
@@ -169,109 +183,114 @@ namespace PTFLauncher
 
         private void btnPlay_Click(object sender, EventArgs e)
         {
-
-
-            bool b1 = false;
-            bool b2 = false;
-
-            if(lblServerStatus.ForeColor == System.Drawing.Color.Green)
+            try
             {
-                b1 = true;
-            }
-            if(classVars.s_lanmode == "true")
-            {
-                b2 = true;
-            }
-            if (b1 || b2)
-            {
-                var ini = new ini(classVars.s_settingspath);
-                string path = ini.Read("path");
-                string autoclean = ini.Read("autoclear");
-                LoadSettings();
+                bool ServerStatus = false;
+                bool LanMode = false;
 
-                try
+                if (lblServerStatus.ForeColor == System.Drawing.Color.Green)
                 {
-                    int i = Convert.ToInt32(classVars.cl_version.Replace(".", ""));
-                    classPatcher.PatchRealmlist(i);
+                    ServerStatus = true;
                 }
-                catch(Exception re)
+                if (classVars.s_lanmode == "true")
                 {
-                    MessageBox.Show(re.ToString());
+                    LanMode = true;
                 }
-                
-                if(classVars.s_lanmode == "false")
+                if (ServerStatus || LanMode)
                 {
-                    if (lblServerStatus.ForeColor == System.Drawing.Color.Red)
-                    {
-                        MessageBox.Show("The worldserver seems to be offline , please check back later. " 
-                            +"\nIf you want to play on a local server please enable LAN Mode in the settings to skip this message.");
-                    }
-                }
-                
+                    var ini = new ini(classVars.s_settingspath);
+                    string path = ini.Read("path");
+                    string autoclean = ini.Read("autoclear");
+                    LoadSettings();
 
-                if (path != null && autoclean == "true")
-                {
                     try
                     {
-                        Directory.Delete(path.Replace("Wow.exe", "") + "Cache", true);
+                        int i = Convert.ToInt32(classVars.cl_version.Replace(".", ""));
+                        classPatcher.PatchRealmlist(i);
                     }
-                    catch
+                    catch (Exception re)
                     {
+                        MessageBox.Show(re.ToString());
+                    }
 
+                    if (classVars.s_lanmode == "false")
+                    {
+                        if (lblServerStatus.ForeColor == System.Drawing.Color.Red)
+                        {
+                            MessageBox.Show("The worldserver seems to be offline , please check back later. "
+                                + "\nIf you want to play on a local server please enable LAN Mode in the settings to skip this message.");
+                        }
+                    }
+
+
+                    if (path != null && autoclean == "true")
+                    {
+                        try
+                        {
+                            Directory.Delete(path.Replace("Wow.exe", "") + "Cache", true);
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    if (classVars.s_autologin == "false")
+                    {
+                        Process.Start(classVars.s_path);
+                    }
+                    this.TopMost = false;
+                    if (!File.Exists(classVars.s_settingspath))
+                    {
+                        MessageBox.Show("Cannot launch game , update your settings please.");
+                    }
+                    else if (classVars.s_autologin == "true")
+                    {
+                        Process proc = Process.Start(classVars.s_path);
+
+                        while (!proc.WaitForInputIdle())
+                        {
+                            System.Threading.Thread.Sleep(4000);
+                        }
+
+                        string u = classVars.s_user;
+                        System.Threading.Thread.Sleep(2000);
+                        string p = classVars.s_pass;
+
+                        foreach (char accNameLetter in u)
+                        {
+                            SendMessage(proc.MainWindowHandle, classVars.WM_CHAR, new IntPtr(accNameLetter), IntPtr.Zero);
+                            System.Threading.Thread.Sleep(100);
+                        }
+
+                        SendMessage(proc.MainWindowHandle, classVars.WM_KEYUP, new IntPtr(classVars.VK_TAB), IntPtr.Zero);
+                        SendMessage(proc.MainWindowHandle, classVars.WM_KEYDOWN, new IntPtr(classVars.VK_TAB), IntPtr.Zero);
+
+                        foreach (char accPassLetter in p)
+                        {
+                            SendMessage(proc.MainWindowHandle, classVars.WM_CHAR, new IntPtr(accPassLetter), IntPtr.Zero);
+                            System.Threading.Thread.Sleep(100);
+                        }
+
+                        SendMessage(proc.MainWindowHandle, classVars.WM_KEYUP, new IntPtr(classVars.VK_RETURN), IntPtr.Zero);
+                        SendMessage(proc.MainWindowHandle, classVars.WM_KEYDOWN, new IntPtr(classVars.VK_RETURN), IntPtr.Zero);
+                        //classVars.b_gamerunning = true;
+                    }
+                    if (classVars.s_playandclose == "true")
+                    {
+                        System.Threading.Thread.Sleep(1000);
+                        Application.Exit();
                     }
                 }
-                if (classVars.s_autologin == "false")
+                else
                 {
-                    Process.Start(classVars.s_path);
-                }
-                this.TopMost = false;
-                if (!File.Exists(classVars.s_settingspath))
-                {
-                    MessageBox.Show("Cannot launch game , update your settings please.");
-                }
-                else if (classVars.s_autologin == "true")
-                {
-                    Process proc = Process.Start(classVars.s_path);
-
-                    while (!proc.WaitForInputIdle())
-                    {
-                        System.Threading.Thread.Sleep(4000);
-                    }
-                    
-                    string u = classVars.s_user;
-                    System.Threading.Thread.Sleep(2000);
-                    string p = classVars.s_pass;
-
-                    foreach (char accNameLetter in u)
-                    {
-                        SendMessage(proc.MainWindowHandle, classVars.WM_CHAR, new IntPtr(accNameLetter), IntPtr.Zero);
-                        System.Threading.Thread.Sleep(100);
-                    }
-                    
-                    SendMessage(proc.MainWindowHandle, classVars.WM_KEYUP, new IntPtr(classVars.VK_TAB), IntPtr.Zero);
-                    SendMessage(proc.MainWindowHandle, classVars.WM_KEYDOWN, new IntPtr(classVars.VK_TAB), IntPtr.Zero);
-
-                    foreach (char accPassLetter in p)
-                    {
-                        SendMessage(proc.MainWindowHandle, classVars.WM_CHAR, new IntPtr(accPassLetter), IntPtr.Zero);
-                        System.Threading.Thread.Sleep(100);
-                    }
-                    
-                    SendMessage(proc.MainWindowHandle, classVars.WM_KEYUP, new IntPtr(classVars.VK_RETURN), IntPtr.Zero);
-                    SendMessage(proc.MainWindowHandle, classVars.WM_KEYDOWN, new IntPtr(classVars.VK_RETURN), IntPtr.Zero);
-
-                }
-                if (classVars.s_playandclose == "true")
-                {
-                    System.Threading.Thread.Sleep(1000);
-                    Application.Exit();
+                    MessageBox.Show("The worldserver seems to be offline , please check back later. "
+                                 + "\nIf you want to play on a local server please enable LAN Mode in the settings to skip this message.");
                 }
             }
-            else
+            catch(Exception ex)
             {
-               MessageBox.Show("The worldserver seems to be offline , please check back later. " 
-                            +"\nIf you want to play on a local server please enable LAN Mode in the settings to skip this message.");
-                     }
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         private void lnkWebsite_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -292,31 +311,7 @@ namespace PTFLauncher
 
         private void clearCacheToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var ini = new ini(classVars.s_settingspath);
-            string path = ini.Read("path");
-            if (path != null)
-            {
-                try
-                {
-                    Directory.Delete(path.Replace("Wow.exe", "") + "Cache", true);
-                }
-                catch
-                {
-                  
-                }
-            }
-
-        }
-
-        public void GetUpdate()
-        {
-            //bool b = updateAvailable();
-            //if (b && classVars.s_update_checks == "true")
-            //{
-            //    string temp = "C:\\users\\public\\temp\\latestLauncher\\PTFLauncher.exe";
-            //    WebClient wc = new WebClient();
-            //    wc.DownloadFile(classVars.url_update, temp);
-            //}
+            classEnv.clearCacheFolder();
         }
 
         private void createAccountToolStripMenuItem_Click(object sender, EventArgs e)
@@ -343,7 +338,7 @@ namespace PTFLauncher
 
         private void updatesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(classVars.b_devUpdate)
+            if (classVars.b_devUpdate)
             {
                 MessageBox.Show("Your version is a development version. No updates available.");
             }
@@ -352,7 +347,13 @@ namespace PTFLauncher
                 bool b = classNetworking.updateAvailable();
                 if (b)
                 {
-                    MessageBox.Show("Update found!" + " - version: " + classVars.version_server + " - Please download and install the update now.");
+                    MessageBox.Show("Update found!"
+                        + "\n"
+                        + " - Server Version : " + classVars.version_server 
+                        + "\n"
+                        + " - Your Version : " + classVars.version_local
+                        + "\n"
+                        + "Please download and install the update now.");
                     linkLabel1.Visible = true;
                     dOWNLOADUPDATEToolStripMenuItem.Visible = true;
                 }
@@ -433,26 +434,33 @@ namespace PTFLauncher
 
         public void updatePlayersOnline()
         {
-            WebClient onlinePlayers = new WebClient();
-            string op = onlinePlayers.DownloadString(classVars.url_s_players);
-            lblOnlinePlayers.Text = "Players online: ";
-            string s = op.Remove(0,2);
-            lblOnlinePlayersValue.Text = s;
+            if (b_serveronline)
+            {
+                WebClient onlinePlayers = new WebClient();
+                string op = onlinePlayers.DownloadString(classVars.url_s_players);
+                lblOnlinePlayers.Text = "Players online: ";
+                string s = op.Remove(0, 2);
+                lblOnlinePlayersValue.Text = s;
+            }
+            else
+            {
+                lblOnlinePlayersValue.Text = "";
+            }
+
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
             try
             {
-                updateServerStatus();
-                updatePlayersOnline();
+                //new Thread(() =>
+                //{
+                    updateServerStatus();
+                    updatePlayersOnline();
+                //}).Start();
+                
             }
             catch { }
-        }
-
-        private void tmrPlayersOnline_Tick(object sender, EventArgs e)
-        {
-
         }
 
         private void openClientFolderToolStripMenuItem_Click(object sender, EventArgs e)
@@ -466,7 +474,7 @@ namespace PTFLauncher
             {
                 MessageBox.Show("Could not open your client folder. Maybe it does not exist or the path was not set correctly in the settings.");
             }
-            
+
         }
 
         private void bugtrackerAttatchmentsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -481,7 +489,7 @@ namespace PTFLauncher
             string bk = wc.DownloadString(classVars.url_news);
             txtNews.Text = bk;
         }
-       
+
         private void txtNews_TextChanged_1(object sender, EventArgs e)
         {
             if (txtNews.Text == "admin")
@@ -510,6 +518,25 @@ namespace PTFLauncher
             fb.Show();
 
         }
+
+        private void EndWoWToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            classEnv.KillProcess("Wow");
+        }
+
+        private void AntiAFKToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            if(classEnv.GameIsRunning())
+            {
+                new Thread(() =>
+                {
+                    Thread.CurrentThread.IsBackground = false;
+                    classAntiAfk.launchAntiAfk();
+                }).Start();
+            }
+            else { MessageBox.Show("No games running.."); }
+        }
+            
     }
 
 }

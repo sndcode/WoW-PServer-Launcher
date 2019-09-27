@@ -32,7 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmLauncher));
             this.btnPlay = new System.Windows.Forms.Button();
             this.lblServerStatus = new System.Windows.Forms.Label();
-            this.lblVersion = new System.Windows.Forms.Label();
+            this.lbluptime = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.launcherToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -40,6 +40,7 @@
             this.überToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.endWoWToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.restartToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.extrasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearCacheToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -48,13 +49,13 @@
             this.bugtrackerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clientDownloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openClientFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.antiAFKToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dEBUGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bugtrackerAttatchmentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.debug01ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.debug02ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.debug03ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.restartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.antiAFKToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dOWNLOADUPDATEToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
@@ -72,9 +73,9 @@
             // 
             // btnPlay
             // 
-            this.btnPlay.Location = new System.Drawing.Point(369, 321);
+            this.btnPlay.Location = new System.Drawing.Point(355, 321);
             this.btnPlay.Name = "btnPlay";
-            this.btnPlay.Size = new System.Drawing.Size(81, 55);
+            this.btnPlay.Size = new System.Drawing.Size(95, 55);
             this.btnPlay.TabIndex = 1;
             this.btnPlay.Text = "Play";
             this.btnPlay.UseVisualStyleBackColor = true;
@@ -89,15 +90,14 @@
             this.lblServerStatus.TabIndex = 2;
             this.lblServerStatus.Text = "-";
             // 
-            // lblVersion
+            // lbluptime
             // 
-            this.lblVersion.AutoSize = true;
-            this.lblVersion.Location = new System.Drawing.Point(83, 316);
-            this.lblVersion.Name = "lblVersion";
-            this.lblVersion.Size = new System.Drawing.Size(10, 13);
-            this.lblVersion.TabIndex = 3;
-            this.lblVersion.Text = "-";
-            this.lblVersion.Visible = false;
+            this.lbluptime.AutoSize = true;
+            this.lbluptime.Location = new System.Drawing.Point(12, 329);
+            this.lbluptime.Name = "lbluptime";
+            this.lbluptime.Size = new System.Drawing.Size(10, 13);
+            this.lbluptime.TabIndex = 3;
+            this.lbluptime.Text = "-";
             // 
             // menuStrip1
             // 
@@ -156,11 +156,20 @@
             // 
             // exitToolStripMenuItem
             // 
+            this.exitToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.endWoWToolStripMenuItem});
             this.exitToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("exitToolStripMenuItem.Image")));
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
+            // endWoWToolStripMenuItem
+            // 
+            this.endWoWToolStripMenuItem.Name = "endWoWToolStripMenuItem";
+            this.endWoWToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.endWoWToolStripMenuItem.Text = "Kill all WoW processes";
+            this.endWoWToolStripMenuItem.Click += new System.EventHandler(this.EndWoWToolStripMenuItem_Click);
             // 
             // restartToolStripMenuItem1
             // 
@@ -178,7 +187,8 @@
             this.createAccountToolStripMenuItem,
             this.bugtrackerToolStripMenuItem,
             this.clientDownloadToolStripMenuItem,
-            this.openClientFolderToolStripMenuItem});
+            this.openClientFolderToolStripMenuItem,
+            this.antiAFKToolStripMenuItem});
             this.extrasToolStripMenuItem.Name = "extrasToolStripMenuItem";
             this.extrasToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
             this.extrasToolStripMenuItem.Text = "Extras";
@@ -231,6 +241,13 @@
             this.openClientFolderToolStripMenuItem.Text = "Open Client Folder";
             this.openClientFolderToolStripMenuItem.Click += new System.EventHandler(this.openClientFolderToolStripMenuItem_Click);
             // 
+            // antiAFKToolStripMenuItem
+            // 
+            this.antiAFKToolStripMenuItem.Name = "antiAFKToolStripMenuItem";
+            this.antiAFKToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+            this.antiAFKToolStripMenuItem.Text = "AntiAFK";
+            this.antiAFKToolStripMenuItem.Click += new System.EventHandler(this.AntiAFKToolStripMenuItem_Click_1);
+            // 
             // dEBUGToolStripMenuItem
             // 
             this.dEBUGToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -238,8 +255,7 @@
             this.debug01ToolStripMenuItem,
             this.debug02ToolStripMenuItem,
             this.debug03ToolStripMenuItem,
-            this.restartToolStripMenuItem,
-            this.antiAFKToolStripMenuItem});
+            this.restartToolStripMenuItem});
             this.dEBUGToolStripMenuItem.ForeColor = System.Drawing.Color.Red;
             this.dEBUGToolStripMenuItem.Name = "dEBUGToolStripMenuItem";
             this.dEBUGToolStripMenuItem.Size = new System.Drawing.Size(95, 20);
@@ -279,13 +295,6 @@
             this.restartToolStripMenuItem.Name = "restartToolStripMenuItem";
             this.restartToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.restartToolStripMenuItem.Text = "Forum Admin";
-            // 
-            // antiAFKToolStripMenuItem
-            // 
-            this.antiAFKToolStripMenuItem.Name = "antiAFKToolStripMenuItem";
-            this.antiAFKToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
-            this.antiAFKToolStripMenuItem.Text = "AntiAFK";
-            this.antiAFKToolStripMenuItem.Click += new System.EventHandler(this.antiAFKToolStripMenuItem_Click);
             // 
             // dOWNLOADUPDATEToolStripMenuItem
             // 
@@ -341,12 +350,11 @@
             // 
             this.tmrPlayersOnline.Enabled = true;
             this.tmrPlayersOnline.Interval = 5000;
-            this.tmrPlayersOnline.Tick += new System.EventHandler(this.tmrPlayersOnline_Tick);
             // 
             // lblOnlinePlayersValue
             // 
             this.lblOnlinePlayersValue.AutoSize = true;
-            this.lblOnlinePlayersValue.Location = new System.Drawing.Point(83, 341);
+            this.lblOnlinePlayersValue.Location = new System.Drawing.Point(98, 341);
             this.lblOnlinePlayersValue.Name = "lblOnlinePlayersValue";
             this.lblOnlinePlayersValue.Size = new System.Drawing.Size(10, 13);
             this.lblOnlinePlayersValue.TabIndex = 11;
@@ -367,7 +375,7 @@
             this.menu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem1});
             this.menu.Name = "contextMenuStrip1";
-            this.menu.Size = new System.Drawing.Size(185, 48);
+            this.menu.Size = new System.Drawing.Size(185, 26);
             // 
             // toolStripMenuItem1
             // 
@@ -385,7 +393,7 @@
             this.Controls.Add(this.lblOnlinePlayersValue);
             this.Controls.Add(this.lblOnlinePlayers);
             this.Controls.Add(this.linkLabel1);
-            this.Controls.Add(this.lblVersion);
+            this.Controls.Add(this.lbluptime);
             this.Controls.Add(this.lblServerStatus);
             this.Controls.Add(this.btnPlay);
             this.Controls.Add(this.menuStrip1);
@@ -410,7 +418,7 @@
         #endregion
         private System.Windows.Forms.Button btnPlay;
         private System.Windows.Forms.Label lblServerStatus;
-        private System.Windows.Forms.Label lblVersion;
+        private System.Windows.Forms.Label lbluptime;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem launcherToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem updatesToolStripMenuItem;
@@ -433,7 +441,6 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.ToolStripMenuItem dOWNLOADUPDATEToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem restartToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem antiAFKToolStripMenuItem;
         private System.Windows.Forms.Timer tmrServerOnline;
         private System.Windows.Forms.Label lblOnlinePlayers;
         private System.Windows.Forms.Timer tmrPlayersOnline;
@@ -443,6 +450,8 @@
         private System.Windows.Forms.RichTextBox txtNews;
         private System.Windows.Forms.ContextMenuStrip menu;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem endWoWToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem antiAFKToolStripMenuItem;
     }
 }
 

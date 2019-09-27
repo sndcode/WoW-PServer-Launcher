@@ -18,10 +18,11 @@ namespace PTFLauncher
         Stopwatch sw = new Stopwatch();
         private void ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            label2.Text = string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
+            label2.Text = string.Format("{0} kb/s",
+                (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
             progressBar1.Value = e.ProgressPercentage;
             label3.Text = e.ProgressPercentage.ToString() + "%";
-            label1.Text = string.Format("{0} MB's / {1} MB's",
+            label1.Text = string.Format("{0} MB of {1} MB",
                 (e.BytesReceived / 1024d / 1024d).ToString("0.00"),
                 (e.TotalBytesToReceive / 1024d / 1024d).ToString("0.00"));
         }
@@ -44,9 +45,13 @@ namespace PTFLauncher
         {
             using (webClient = new WebClient())
             {
-                webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
-                webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
-                Uri URL = urlAddress.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ? new Uri(urlAddress) : new Uri("http://" + urlAddress);
+                webClient.DownloadFileCompleted 
+                    += new AsyncCompletedEventHandler(Completed);
+                webClient.DownloadProgressChanged 
+                    += new DownloadProgressChangedEventHandler(ProgressChanged);
+                Uri URL = 
+                    urlAddress.StartsWith("https://", StringComparison.OrdinalIgnoreCase) 
+                    ? new Uri(urlAddress) : new Uri("https://" + urlAddress);
                 
                 sw.Start();
 
@@ -68,7 +73,7 @@ namespace PTFLauncher
             {
                 this.BringToFront();
                 button3.Enabled = true;
-                string downloadfolder;
+                string downloadfolder = "";
                 SaveFileDialog sfd = new SaveFileDialog();
                 sfd.ShowDialog();
                 downloadfolder = sfd.FileName + ".zip";
@@ -87,6 +92,11 @@ namespace PTFLauncher
 
                 try
                 {
+                    if(downloadfolder.Contains(".zip.zip"))
+                    {
+                        downloadfolder.Replace(".zip.zip", ".zip");
+                    }
+
                     DownloadFile(classVars.url_download_file, downloadfolder);
                     this.Text += " - " + downloadfolder;
                 }
@@ -106,7 +116,7 @@ namespace PTFLauncher
         {
             label3.Text = "";
             label1.Text = "";
-            this.TopMost = true;
+            //this.TopMost = true;
             button3.Enabled = false;
         }
 
@@ -123,8 +133,8 @@ namespace PTFLauncher
                 MessageBox.Show(ee.ToString());
             }
             MessageBox.Show("Download cant be canceled without the application to exit. We are sorry but you have to restart this program manually.");
-            System.Windows.Forms.Application.Restart();
-            System.Windows.Forms.Application.Exit();
+            Application.Restart();
+            Application.Exit();
 
         }
 

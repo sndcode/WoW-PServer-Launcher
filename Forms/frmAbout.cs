@@ -20,8 +20,11 @@ namespace PTFLauncher
         
         private void frmAbout_Load(object sender, EventArgs e)
         {
-            label2.Text = classVars.appversion;
+            label2.Text = "Using : " + classVars.appversion + " " + classVars.s_localbranch 
+                + "\n" + 
+                            "Newest : " + classVars.version_server + " " + classVars.s_serverbranch;
             this.TopMost = true;
+
         }
 
         private void label1_Click(object sender, EventArgs e)

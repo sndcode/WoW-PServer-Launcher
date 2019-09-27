@@ -42,6 +42,7 @@ namespace PTFLauncher
                     {
                         File.WriteAllText(classVars.s_path.Replace("Wow.exe", "\\Data\\deDE\\realmlist.wtf"), classVars.s_realmlistFullContent);
                         File.WriteAllText(classVars.s_path.Replace("Wow.exe", "\\Data\\enUS\\realmlist.wtf"), classVars.s_realmlistFullContent);
+                        File.WriteAllText(classVars.s_path.Replace("Wow.exe", "\\Data\\enGB\\realmlist.wtf"), classVars.s_realmlistFullContent);
                     }
                     catch
                     {
@@ -51,7 +52,9 @@ namespace PTFLauncher
                 case 434:
                     try
                     {
-                       
+                        File.WriteAllText(classVars.s_path.Replace("Wow.exe", "\\Data\\deDE\\realmlist.wtf"), classVars.s_realmlistFullContent);
+                        File.WriteAllText(classVars.s_path.Replace("Wow.exe", "\\Data\\enUS\\realmlist.wtf"), classVars.s_realmlistFullContent);
+                        File.WriteAllText(classVars.s_path.Replace("Wow.exe", "\\Data\\enGB\\realmlist.wtf"), classVars.s_realmlistFullContent);
                     }
                     catch
                     {

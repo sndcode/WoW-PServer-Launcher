@@ -82,6 +82,7 @@ namespace PTFLauncher
             antiAfkBattleground = answer == "A";
 
             Console.WriteLine("Entering whisper loop now. Your character(s) won't go AFK.");
+            Console.WriteLine("You can now even close the main launcher but leave this window open.");
 
             //! Make sure the return key is released for each process before continuing. Not the cleanest, but it has to be made sure.
             foreach (Process process in processesList)

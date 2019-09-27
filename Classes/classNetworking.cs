@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using System.Net.Sockets;
 using System.Net;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace PTFLauncher
 {
@@ -28,62 +29,129 @@ namespace PTFLauncher
             tc.Close();
             return false;
         }
-        public static bool updateAvailable()//Needs a rework since it cant decide between 0094 alpha and 010 beta 
+        public static bool serverbranchnewer;
+        public static bool updateAvailable()
         {
             try
-            {   
+            {
                 WebClient wc = new WebClient();
-                string s = wc.DownloadString(classVars.url_version);
-                string s2 = classVars.appversion;
-                classVars.version_server = s;
-
-                if (s != s2)
+                string serverversion = wc.DownloadString(classVars.url_version).Replace(".", "");
+                string localversion = classVars.appversion.Replace(".", "");
+                classVars.version_server = serverversion;
+                classVars.version_local = localversion;
+                //Init branches
+                string serverbranch     = "";
+                string localbranch      = "";
+                
+                ///////////////////////// Branch checks
+                if (serverversion.Contains("a"))
                 {
-                    
-                    int i = Convert.ToInt32(s.Replace(".", ""));//Server
-                    int i2 = Convert.ToInt32(s2.Replace(".", ""));//Local
+                    serverbranch = "alpha";
+                }
+                else if(serverversion.Contains("b"))
+                {
+                    serverbranch = "beta";
+                }
+                else if (serverversion.Contains("r"))
+                {
+                    serverbranch = "release";
+                }
+                if (localversion.Contains("a"))
+                {
+                    localbranch = "alpha";
+                }
+                else if (localversion.Contains("b"))
+                {
+                    localbranch = "beta";
+                }
+                else if (localversion.Contains("r"))
+                {
+                    localbranch = "release";
+                }
 
-                    //MessageBox.Show("Server Version : " + i.ToString() + " Local Version : " + i2.ToString());
-                    
+                if(serverbranch == "alpha" && localbranch == "alpha")
+                {
+                    serverbranchnewer = true;
+                }
+                else if (serverbranch == "alpha" && localbranch == "beta")
+                {
+                    serverbranchnewer = false;
+                }
+                else if (serverbranch == "alpha" && localbranch == "release")
+                {
+                    serverbranchnewer = false;
+                }
+                else if (serverbranch == "beta" && localbranch == "alpha")
+                {
+                    serverbranchnewer = true;
+                }
 
-                    string build;
-                    /* Alpha 0.0.1
-                     * Beta 0.1.0
-                     * release 0.1.0
-                     */
+                else if (serverbranch == "release" && localbranch == "alpha")
+                {
+                    serverbranchnewer = true;
+                }
+                else if (serverbranch == "beta" && localbranch == "beta")
+                {
+                    serverbranchnewer = true;
+                }
+                else if (serverbranch == "release" && localbranch == "beta")
+                {
+                    serverbranchnewer = true;
+                }
 
-                    if (i > i2)
+                //Also Store publicly
+                classVars.s_localbranch     = localbranch;
+                classVars.s_serverbranch    = serverbranch;
+
+                //////////////////////////////////// detail check
+                if (serverversion != localversion)
+                {
+                    string serverversion02  = Regex.Replace(serverversion.Replace("0", ""), "[^.0-9]", "");
+                    string localversion02   = Regex.Replace(localversion.Replace("0", ""), "[^.0-9]", "");
+
+                    int iserver = Convert.ToInt32(serverversion02);//Server
+                    int ilocal = Convert.ToInt32(localversion02);//Local
+
+                    if (iserver > ilocal && serverbranchnewer)
                     {
                         return true;
                     }
-                    else if (i < i2)
+                    else if (iserver < ilocal && !serverbranchnewer)
                     {
-                        classVars.b_devUpdate = true;
+                        //classVars.b_devUpdate = true;
                         return false;
                     }
-                    
-                    return false;
+                    else if (iserver < ilocal && serverbranchnewer)
+                    {
+                        //classVars.b_devUpdate = true;
+                        return true;
+                    }
+
+                    // return false;
                 }
-                
+
                 return false;
             }
-            catch
+
+            catch(Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return false;
             }
         }
         public static bool checkConnection()
         {
-            WebClient wc = new WebClient();
-            try
-            {
-                wc.DownloadString(classVars.url_s_online);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            //WebClient wc = new WebClient();
+            //try
+            //{
+            //    wc.DownloadString(classVars.url_s_online);
+            //    return true;
+            //}
+            //catch
+            //{   //TODO : add GLOBAL check to make sure Launcher works in LAN mode without internet.
+            //    return false;
+            //}
+            return true;
         }
 
     }

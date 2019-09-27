@@ -20,8 +20,7 @@ namespace PTFLauncher
                 try
                 {
                     int rng;
-                    Random rnd          = new Random();
-                    rng                 = rnd.Next(0, 9999);
+                    rng                 = classEnv.RandomGen();
                     var ini             = new ini(classVars.s_settingspath);
                     string username     = ini.Read("user");
                     string path         = "C:\\users\\public\\" 
@@ -106,6 +105,7 @@ namespace PTFLauncher
             {
 
                 OpenFileDialog ofd = new OpenFileDialog();
+                ofd.InitialDirectory = Application.StartupPath;
                 if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     System.IO.StreamReader sr = new
@@ -138,6 +138,15 @@ namespace PTFLauncher
                 classVars.b_upl_filesize_ok = false;
             }
             
+        }
+
+        private void Button2_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Do you want to take a screenshot?", "Take screenshot?", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+                classEnv.takeScreenshot();
+            }
         }
     }
 }
